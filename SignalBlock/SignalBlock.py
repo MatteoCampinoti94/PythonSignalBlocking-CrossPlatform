@@ -29,6 +29,7 @@ class sigblock:
         if sig == None:
             for sig in sigblock._blocked:
                 signal.signal(sig, sigblock._blocked[sig])
+            blocked_clear()
         else:
             if type(sig) != signal.Signals:
                 raise TypeError('Argument has to be of type signal.Signals')

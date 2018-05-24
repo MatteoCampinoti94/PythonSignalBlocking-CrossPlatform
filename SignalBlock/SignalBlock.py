@@ -3,50 +3,45 @@ import signal
 def signal_handler(signum, frame):
     sigblock._pending += (signum,)
 
-def signal_clear():
-    sigblock._pending = ()
-
-def blocked_clear(sig=None):
-    if sig == None:
-        sigblock._blocked = {}
-    else:
-        del sigblock._blocked[sig]
-
 class sigblock:
     _pending = ()
     _handler = signal_handler
     _blocked = {}
 
-    def block(sig, handler=_handler):
+    @classmethod
+    def block(cls, sig, handler=_handler):
         if type(sig) != signal.Signals:
             raise TypeError('Argument has to be of type signal.Signals')
 
-        if sig not in sigblock._blocked:
-            sigblock._blocked[sig] = signal.getsignal(sig)
+        if sig not in cls._blocked:
+            cls._blocked[sig] = signal.getsignal(sig)
         signal.signal(sig, handler)
 
-    def unblock(sig=None):
+    @classmethod
+    def unblock(cls, sig=None):
         if sig == None:
-            for sig in sigblock._blocked:
-                signal.signal(sig, sigblock._blocked[sig])
-            blocked_clear()
+            for sig in cls._blocked:
+                signal.signal(sig, cls._blocked[sig])
+                del cls._blocked[sig]
         else:
             if type(sig) != signal.Signals:
                 raise TypeError('Argument has to be of type signal.Signals')
-            elif sig not in sigblock._blocked:
+            elif sig not in cls._blocked:
                 return
 
-            signal.signal(sig, sigblock._blocked[sig])
-            blocked_clear(sig)
+            signal.signal(sig, cls._blocked[sig])
+            cls._blocked.clear()
 
-    def pending(sig=None):
+    @classmethod
+    def pending(cls, sig=None):
         if sig != None:
             if type(sig) != signal.Signals:
                 raise TypeError('Argument has to be of type signal.Signals')
 
-            return sig.value in sigblock._pending
+            return sig.value in cls._pending
         else:
-            return sigblock._pending
+            return cls._pending
 
-    def clear():
-        signal_clear()
+    @classmethod
+    def clear(cls):
+        cls._pending = ()

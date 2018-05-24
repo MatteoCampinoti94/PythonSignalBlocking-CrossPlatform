@@ -8,8 +8,9 @@ def signal_clear():
 
 class sigblock:
     _pending = ()
+    _handler = signal_handler
 
-    def block(sig, handler=signal_handler):
+    def block(sig, handler=_handler):
         if type(sig) != signal.Signals:
             raise TypeError('Argument has to be of type signal.Signals')
 

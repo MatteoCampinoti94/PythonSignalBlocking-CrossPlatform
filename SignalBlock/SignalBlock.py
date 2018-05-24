@@ -15,11 +15,14 @@ class sigblock:
 
         signal.signal(sig, handler)
 
-    def pending(sig):
-        if type(sig) != signal.Signals:
-            raise TypeError('Argument has to be of type signal.Signals')
+    def pending(sig=None):
+        if sig != None:
+            if type(sig) != signal.Signals:
+                raise TypeError('Argument has to be of type signal.Signals')
 
-        return sig.value in sigblock._pending
+            return sig.value in sigblock._pending
+        else:
+            return sigblock._pending
 
     def clear():
         signal_clear()
